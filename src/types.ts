@@ -1,7 +1,7 @@
 export interface Data {
   productRef: number;
   productName: string;
-  brandName: "aldo";
+  brandName: string;
   size: number[];
   color: string[];
   image: string[];

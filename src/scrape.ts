@@ -25,62 +25,51 @@ const csvWriter = createCsvWriter({
 
 const main = async () => {
   const browser: Browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     defaultViewport: false,
+    args: ["--disable-infobars"],
+    //  ignoreDefaultArgs: ["--enable-automation"],
   });
 
   const page = await browser.newPage();
+
   await page.goto(url);
 
   await page.click(".cookies_info-pop-buttons-accept");
 
   await page.click("#onglets > li:nth-child(1) > a");
 
-  await page.waitForSelector(".dis_content_img display_product3 > a");
+  await page.waitForSelector(".dis_content_img .display_product3 > a");
 
-  const scrapedData: Data[] = [];
+  const productRef = await page.$eval(
+    "#products_info_refspartoo",
+    (el) => el.textContent
+  );
+  const productName = await page.$eval(".seo_hn_tag", (el) => el.textContent);
+  const brandName = "ALDO";
+  const size = await page.$eval(".size_name", (el) => el.textContent);
+  const color = await page.$eval(
+    "[itemprop=color] meta",
+    (el) => el.textContent
+  );
+  const image = await page.$$("productView a > .thumbnail");
+  const mainCategory = await page.$eval(
+    "#parent > div:nth-child(1) > span",
+    (el) => el.textContent
+  );
+  const subCategory = "";
+  const resumLong = "";
+  const resumCourt = "";
+  const description = await page.$$("#products_info_composition > li");
+  const price = await page.$eval(
+    ".productlist_prix span",
+    (el) => el.textContent
+  );
 
-  // const scrapeCurrentPage = async () => {
-  //   try {
-  //     await page.waitForSelector(".productsList");
-
-  //     let urls = await page.evaluate(".global_products", (links: any) => {
-  //       links.map((link: any) => link.querySelector().href);
-  //       return links;
-  //     });
-
-  //     let getPagaData = async (link: string) => {
-  //       let data = {
-  //         productRef: null,
-  //         productName: "",
-  //         brandName: "Aldo",
-  //         size: [],
-  //         color: [],
-  //         image: [],
-  //         mainCategory: "",
-  //         subCategory: "",
-  //         resumLong: "",
-  //         resumCourt: "",
-  //         description: "",
-  //         price: null,
-  //       };
-  //       let newPage = await browser.newPage();
-  //       await newPage.goto(link);
-
-  //       const ref = await newPage.waitForSelector("#products_info_refspartoo");
-  //       const productRef = await ref?.evaluate((el) => el.textContent);
-
-  //       console.log("productRef", productRef);
-
-  //       return data;
-  //     };
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  let scrapedData: Data[] = [];
 
   // const productData = await page.evaluate(() => {
-  //   const products = Array.from(document.querySelectorAll(".productsList"));
+  //   const products = Array.from(document.querySelector(".productsList"));
 
   //   const data = products.map((product: any) => ({
   //     productRef: "",
@@ -98,34 +87,7 @@ const main = async () => {
   //   }));
   //   return data;
 
-  //   // page.click(".dis_content_img_product");
-
-  //   // for (const product of products) {
-  //   //   let productRef = "";
-  //   //   let productName = "";
-  //   //   let brandName = "Aldo";
-  //   //   let size = [];
-  //   //   let color = [];
-  //   //   let image = [];
-  //   //   let mainCategory = "";
-  //   //   let subCategory = "";
-  //   //   let resumLong = "";
-  //   //   let resumCourt = "";
-  //   //   let description = "";
-  //   //   let price: null;
-
-  //   //   try {
-  //   //     productRef = await page.evaluate(
-  //   //       (el: any) =>
-  //   //         el.querySelector("#products_info_refspartoo").textContent,
-  //   //       product
-  //   //     );
-  //   //   } catch (error) {}
-  //   // }
-  // });
   // console.log(productData);
-
-  //let data = await scrapeCurrentPage();
 
   csvWriter.writeRecords(scrapedData);
 
