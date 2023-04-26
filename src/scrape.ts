@@ -26,7 +26,7 @@ const csvWriter = createCsvWriter({
 
 const main = async () => {
   const browser: Browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     defaultViewport: false,
     ignoreDefaultArgs: ["--enable-automation"],
   });
